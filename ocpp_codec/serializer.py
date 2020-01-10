@@ -5,6 +5,7 @@ from dataclasses import fields
 from dataclasses import is_dataclass
 import functools
 import logging
+import sys
 import typing
 
 from ocpp_codec import compat
@@ -58,6 +59,8 @@ def _is_list(type_):
 
 
 def _is_generic(type_):
+    if (3, 6) <= sys.version_info < (3, 7):
+        return isinstance(type_, typing.GenericMeta)
     return isinstance(type_, typing._GenericAlias)
 
 
