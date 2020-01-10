@@ -209,15 +209,14 @@ _MSGTYPEID_TO_DATACLASS = {
 _DEFAULT_CALLERROR_UNIQUEID = "-1"
 
 
-def parse(
-    raw_data: typing.Any, call_result_action_name: typing.Optional[str] = None, *, protocol: compat.OcppJsonProtocol
-) -> structure.OCPPMessage:
-    """Fit 'raw_data' based on Python simple types into an 'OCPPMessage' dataclass.
+def parse_structure(raw_data: typing.Any, *, protocol: compat.OcppJsonProtocol) -> structure.OCPPMessage:
+    """Tries to parse the general structure of an OCPP message, without parsing its payload.
+
+    This is the first step required to parse an OCPP message: determine whether it's a Call, CallResult or CallError
+    message. Then further parsing can take place in the case of Call and CallResult messages.
 
     Args:
         - raw_data: object, Python representation of an OCPPMessage, using only simple types
-        - call_result_action_name: str, name of the 'Action' class to use to parse 'CallResult' payloads, only useful
-          when parsing such a message, it's ignored otherwise (default: None)
         - protocol: OcppJsonProtocol, which version of the OCPP Json protocol are we using (mostly defines which error
                     codes to use)
 
@@ -252,11 +251,35 @@ def parse(
     if 'payload' in ocpp_dict and ocpp_dict['payload'] is None:
         ocpp_dict['payload'] = {}
 
-    # First, parse the global message structure (Call, CallResult, CallError)
     try:
         ocpp_msg = parse_data(msgtype_dataclass, ocpp_dict)
     except errors.BaseOCPPError as exc:
         raise exceptions.OCPPException(exc, _DEFAULT_CALLERROR_UNIQUEID)
+
+    return ocpp_msg
+
+
+def parse(
+    raw_data: typing.Any, call_result_action_name: typing.Optional[str] = None, *, protocol: compat.OcppJsonProtocol
+) -> structure.OCPPMessage:
+    """Fits 'raw_data' based on Python simple types into an 'OCPPMessage' dataclass.
+
+    Args:
+        - raw_data: object, Python representation of an OCPPMessage, using only simple types
+        - call_result_action_name: str, name of the 'Action' class to use to parse 'CallResult' payloads, only useful
+          when parsing such a message, it's ignored otherwise (default: None)
+        - protocol: OcppJsonProtocol, which version of the OCPP Json protocol are we using (mostly defines which error
+                    codes to use)
+
+    Returns:
+        OCPPMessage, a type-checked dataclass instance, using more complex types as defined by the OCPP specification
+
+    Raises:
+        exceptions.OCPPException: raised when the OCPP message contains an error, can be converted a CallError message
+        ValueError: raised when call_result_action_name isn't provided but we're parsing a CallResult message
+    """
+    # First, parse the global message structure (Call, CallResult, CallError)
+    ocpp_msg = parse_structure(raw_data, protocol=protocol)
 
     # Then, extra parsing required for messages with a payload (i.e.: CALL and CALLRESULT)
     if ocpp_msg.messageTypeId in (structure.MessageTypeEnum.CALL, structure.MessageTypeEnum.CALLRESULT):

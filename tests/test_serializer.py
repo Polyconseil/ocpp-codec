@@ -154,6 +154,91 @@ def test_parse_data():
         common_types.ErrorCodeEnum.MessageTypeNotSupported,
     ),
 ])
+def test_parse_structure(protocol, rpcframework_error, msgtype_error):
+    # Call
+    call_msg = serializer.parse_structure([2, "19223201", "DontCare", {"dont": "care"}], protocol=protocol)
+    assert call_msg == structure.Call(
+        messageTypeId=structure.MessageTypeEnum.CALL,
+        uniqueId='19223201',
+        action='DontCare',
+        payload={'dont': 'care'},
+    )
+
+    # CallResult
+    call_result_msg = serializer.parse_structure([3, "19223201", {"dont": "care"}], protocol=protocol)
+    assert call_result_msg == structure.CallResult(
+        messageTypeId=structure.MessageTypeEnum.CALLRESULT,
+        uniqueId='19223201',
+        payload={'dont': 'care'},
+    )
+
+    # CallError
+    call_error_msg = serializer.parse_structure(
+        [4, "19223201", "GenericError", "DontCare", {"dont": "care"}],
+        protocol=protocol,
+    )
+    assert call_error_msg == structure.CallError(
+        messageTypeId=structure.MessageTypeEnum.CALLERROR,
+        uniqueId='19223201',
+        errorCode=common_types.ErrorCodeEnum.GenericError,
+        errorDescription='DontCare',
+        errorDetails={'dont': 'care'},
+    )
+
+    # Empty payload as {} or null is ok
+    call_msg = serializer.parse_structure([2, "19223201", "NoPayloadAction", {}], protocol=protocol)
+    assert call_msg == structure.Call(
+        messageTypeId=structure.MessageTypeEnum.CALL,
+        uniqueId='19223201',
+        action='NoPayloadAction',
+        payload={},
+    )
+    call_msg = serializer.parse_structure([2, "19223201", "NoPayloadAction", None], protocol=protocol)
+    assert call_msg == structure.Call(
+        messageTypeId=structure.MessageTypeEnum.CALL,
+        uniqueId='19223201',
+        action='NoPayloadAction',
+        payload={},
+    )
+
+    # Valid JSON but not OCPP-J
+    with pytest.raises(exceptions.OCPPException) as excinfo:
+        serializer.parse_structure({"that_is_not": "ocpp-json"}, protocol=protocol)
+    assert excinfo.value.as_call_error.errorCode == rpcframework_error
+    assert excinfo.value.as_call_error.uniqueId == "-1"
+    # Valid OCPP-J but empty list that we cannot guess anything from
+    with pytest.raises(exceptions.OCPPException) as excinfo:
+        serializer.parse_structure([], protocol=protocol)
+    assert excinfo.value.as_call_error.errorCode == rpcframework_error
+    assert excinfo.value.as_call_error.uniqueId == "-1"
+    # Unknown MessageType
+    with pytest.raises(exceptions.OCPPException) as excinfo:
+        serializer.parse_structure([666], protocol=protocol)
+    assert excinfo.value.as_call_error.errorCode == msgtype_error
+    assert excinfo.value.as_call_error.uniqueId == "-1"
+    # Malformed message
+    with pytest.raises(exceptions.OCPPException) as excinfo:
+        serializer.parse_structure([2, 666, "this_is_crazy", "stop_this_folly"], protocol=protocol)
+    assert excinfo.value.as_call_error.errorCode == common_types.ErrorCodeEnum.TypeConstraintViolation
+    assert excinfo.value.as_call_error.uniqueId == "-1"
+    # Exception can be converted to CallError
+    assert excinfo.value.as_call_error == structure.CallError(
+        messageTypeId=structure.MessageTypeEnum.CALLERROR,
+        uniqueId='-1',
+        errorCode=common_types.ErrorCodeEnum.TypeConstraintViolation,
+        errorDescription="Value '666' is not of type 'str' (type is 'int')",
+        errorDetails={'value': 666, 'field': 'uniqueId'},
+    )
+
+
+@pytest.mark.parametrize('protocol,rpcframework_error,msgtype_error', [
+    (compat.OcppJsonProtocol.v16, common_types.ErrorCodeEnum.GenericError, common_types.ErrorCodeEnum.GenericError),
+    (
+        compat.OcppJsonProtocol.v20,
+        common_types.ErrorCodeEnum.RpcFrameworkError,
+        common_types.ErrorCodeEnum.MessageTypeNotSupported,
+    ),
+])
 def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
     # Make sure the parser knows about our messages, bypassing selection made based on the protocol
     mocker.patch('ocpp_codec.compat.get_implemented_messages', return_value=messages.IMPLEMENTED)
