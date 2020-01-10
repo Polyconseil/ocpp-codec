@@ -1,6 +1,7 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
 """OCPP-JSON serialization, parsing and validation."""
 import copy
+import dataclasses
 from dataclasses import fields
 from dataclasses import is_dataclass
 import functools
@@ -19,20 +20,20 @@ from ocpp_codec import validators
 logger = logging.getLogger(__name__)
 
 
-def _is_optional(field):
+def _is_optional(field: dataclasses.Field) -> bool:
     return field.default is None
 
 
-def _is_undefined(field, value):
+def _is_undefined(field: dataclasses.Field, value: typing.Any) -> bool:
     # Special case to consider [] as undefined for List types
     return value is None or (_is_list(field.type) and not value)
 
 
-def required_fields(dataclass_class):
+def required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
     return [field for field in fields(dataclass_class) if not _is_optional(field)]
 
 
-def _run_validator(field, data, *, parsing):
+def _run_validator(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
     # Fetch the validator to run
     validator = field.metadata.get('validator', validators.noop)
     if isinstance(validator, validators.BaseEncoder):
@@ -64,7 +65,7 @@ def _is_generic(type_):
     return isinstance(type_, typing._GenericAlias)
 
 
-def _unpack_field(field):
+def _unpack_field(field: dataclasses.Field) -> dataclasses.Field:
     """Extract the type contained inside the generic definition.
 
     Replaces the field's type with the type contained inside its generic type, e.g.: List[int] -> int
@@ -77,7 +78,7 @@ def _unpack_field(field):
     return new_field
 
 
-def _extract_base_type(field):
+def _extract_base_type(field: dataclasses.Field) -> dataclasses.Field:
     """Extract the real type out of a SimpleType instance.
 
     The returned field is a copy of the original, as the original resides in the class definition. Modifying it would be
@@ -93,7 +94,7 @@ def _extract_base_type(field):
 #########
 # Parsing
 
-def parse_field(field, data):
+def parse_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
     """Tries to fit a JSON object into a dataclass field.
 
     Makes sure the data received from the network connection is of the expected type, before validation.
@@ -208,7 +209,9 @@ _MSGTYPEID_TO_DATACLASS = {
 _DEFAULT_CALLERROR_UNIQUEID = "-1"
 
 
-def parse(raw_data, call_result_action_name=None, *, protocol):
+def parse(
+    raw_data: typing.Any, call_result_action_name: typing.Optional[str] = None, *, protocol: compat.OcppJsonProtocol
+) -> structure.OCPPMessage:
     """Fit 'raw_data' based on Python simple types into an 'OCPPMessage' dataclass.
 
     Args:
@@ -288,7 +291,7 @@ def parse(raw_data, call_result_action_name=None, *, protocol):
 #############
 # Serializing
 
-def serialize_field(field, data):
+def serialize_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
     """Serializes a data element against a dataclass field.
 
     Makes sure the data going out onto the network is of the expected type, after validation.
@@ -372,7 +375,7 @@ def serialize_fields(message):
     return serialized_dict
 
 
-def serialize(message):
+def serialize(message: typing.Union[structure.Call, structure.CallResult, structure.CallError]) -> typing.List:
     """Serializes an 'OCPPMessage'.
 
     Args:

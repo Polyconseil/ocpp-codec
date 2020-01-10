@@ -19,6 +19,7 @@ Validators are assigned to a dataclass field through its metadata 'validator' ke
 import datetime
 import functools
 import re
+import typing
 
 import dateutil.parser
 import pytz
@@ -29,7 +30,7 @@ from ocpp_codec import errors
 ###########
 # Utilities
 
-def compound_validator(*validators):
+def compound_validator(*validators: typing.Callable[[typing.Any], typing.Any]):
     """Run several validators on the same input data."""
     def _validator(value):
         for v in validators:
@@ -38,7 +39,7 @@ def compound_validator(*validators):
     return _validator
 
 
-def build_simple_validator(func, *args, **kwargs):
+def build_simple_validator(func: typing.Callable, *args, **kwargs) -> typing.Callable[[typing.Any], typing.Any]:
     """Build a ready-to-use simple validator out of a function.
 
     Args:
@@ -57,12 +58,12 @@ def build_simple_validator(func, *args, **kwargs):
 ############
 # Validators
 
-def noop(value):
+def noop(value: typing.Any) -> typing.Any:
     """A no-op validator, used as a default validator when none is specified."""
     return value
 
 
-def max_length(length, value):
+def max_length(length: int, value: typing.Any) -> typing.Any:
     """Validates that an input doesn't exceed a given length."""
     actual_length = len(value)
     if actual_length > length:
@@ -84,7 +85,7 @@ max_length_500 = build_simple_validator(max_length, 500)
 max_length_512 = build_simple_validator(max_length, 512)
 
 
-def decimal(precision, value):
+def decimal(precision: int, value: float) -> float:
     components = str(value).split('.')
     if len(components[-1]) > precision:
         raise errors.PropertyConstraintViolationError("Decimal value precision is too big", precision=precision)
@@ -94,13 +95,13 @@ def decimal(precision, value):
 decimal_precision_1 = build_simple_validator(decimal, 1)
 
 
-def is_positive(value):
+def is_positive(value: typing.Union[int, float]) -> typing.Union[int, float]:
     if value < 0:
         raise errors.PropertyConstraintViolationError("Input is negative")
     return value
 
 
-def is_not_zero(value):
+def is_not_zero(value: typing.Union[int, float]) -> typing.Union[int, float]:
     if value == 0:
         raise errors.PropertyConstraintViolationError("Input is zero")
     return value
@@ -112,7 +113,7 @@ is_strictly_positive = compound_validator(is_positive, is_not_zero)
 _IDENTIFIER_REGEXP = re.compile('[a-zA-Z0-9' + re.escape('*_=:+|@.-') + ']*')
 
 
-def is_identifier(value):
+def is_identifier(value: str) -> str:
     if not _IDENTIFIER_REGEXP.fullmatch(value):
         raise errors.PropertyConstraintViolationError(
             "Input is not a valid identifier",
@@ -128,11 +129,11 @@ def is_identifier(value):
 class BaseEncoder:
     """Base encoder from type A to B."""
 
-    def from_json(self, json_value):
+    def from_json(self, json_value: typing.Any) -> typing.Any:
         """Encoding function handling conversion from OCPP-JSON to Python types."""
         raise NotImplementedError
 
-    def to_json(self, value):
+    def to_json(self, value: typing.Any) -> typing.Any:
         """Encoding function handling conversion from Python types to OCPP-JSON."""
         raise NotImplementedError
 
@@ -147,7 +148,7 @@ class DateTimeEncoder(BaseEncoder):
     available.
     """
 
-    def from_json(self, json_value):
+    def from_json(self, json_value: str) -> datetime.datetime:
         try:
             dt = dateutil.parser.isoparse(json_value)
         except (ValueError, OverflowError) as exc:
@@ -159,14 +160,14 @@ class DateTimeEncoder(BaseEncoder):
             # Assume naive datetime are UTC, so that we don't reject charge points who expect to speak UTC by default
             if not dt.tzinfo:
                 dt = dt.replace(tzinfo=pytz.UTC)
-            if dt.tzinfo.tzname(dt) != 'UTC':
+            if dt.tzinfo.tzname(dt) != 'UTC':  # type: ignore # mypy doesn't catch that dt.replace call sets tzinfo
                 raise errors.PropertyConstraintViolationError(
                     f"Date input must use the UTC timezone, not '{dt.tzinfo}'",
                     value=dt,
                 )
             return dt
 
-    def to_json(self, value):
+    def to_json(self, value: datetime.datetime) -> str:
         if not isinstance(value, datetime.datetime):
             raise errors.TypeConstraintViolationError(
                 f"Input '{value}' is not a datetime.datetime instance",
