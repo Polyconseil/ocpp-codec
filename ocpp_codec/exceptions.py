@@ -2,8 +2,6 @@
 """This module contains errors raised during (de)serialization of OCPP messages.
 """
 
-#############################
-# Library specific exceptions
 
 class OCPPException(Exception):
     """Exception wrapping a 'BaseOCPPError', tying it to a specific request.

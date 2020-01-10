@@ -29,7 +29,7 @@ def _is_undefined(field: dataclasses.Field, value: typing.Any) -> bool:
     return value is None or (_is_list(field.type) and not value)
 
 
-def required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
+def _required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
     return [field for field in fields(dataclass_class) if not _is_optional(field)]
 
 
@@ -147,12 +147,12 @@ def parse_data(dataclass_class, data):
             "Data has more fields than expected. Got: '%s' for message '%s'",
             ', '.join(data.keys()),
             dataclass_class.__name__
-                if not hasattr(dataclass_class, '_action_class') else dataclass_class._action_class.__name__,
+            if not hasattr(dataclass_class, '_action_class') else dataclass_class._action_class.__name__,
         )
         raise errors.ProtocolError("Too many arguments provided")
 
     # Make sure every required fields can be found in data, and are defined
-    req_fields = set(required_fields(dataclass_class))
+    req_fields = set(_required_fields(dataclass_class))
     req_fields_names = {field.name for field in req_fields}
     provided_fields_names = set(data.keys())
     if (
@@ -225,7 +225,7 @@ def parse(
         OCPPMessage, a type-checked dataclass instance, using more complex types as defined by the OCPP specification
 
     Raises:
-        - exceptions.OCPPException
+        exceptions.OCPPException: raised when the OCPP message contains an error, can be converted a CallError message
     """
     if not isinstance(raw_data, list) or not raw_data:
         logger.warning("Received invalid OCPP '%s'", raw_data)
@@ -272,11 +272,11 @@ def parse(
         try:
             action_dataclass = implemented_messages[action_name]
         except KeyError:
-            exc = errors.NotImplementedError(
+            error = errors.NotImplementedError(
                 f"Action '{action_name}' is not implemented",
                 available_actions=list(implemented_messages.keys()),
             )
-            raise exceptions.OCPPException(exc, ocpp_msg.uniqueId)
+            raise exceptions.OCPPException(error, ocpp_msg.uniqueId)
 
         if is_call:
             payload_dataclass = compat.get_request_payload_dataclass(action_dataclass)
@@ -398,7 +398,7 @@ def serialize(message: typing.Union[structure.Call, structure.CallResult, struct
         serialize_field(field, getattr(message, field.name))
         for field in fields(message) if field.name != 'payload'
     ]
-    if hasattr(message, 'payload'):
+    if isinstance(message, (structure.Call, structure.CallResult)):
         ocpp_msg.append(serialize_fields(message.payload))
 
     return ocpp_msg
