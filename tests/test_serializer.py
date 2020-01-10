@@ -216,6 +216,11 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
         serializer.parse_structure([666], protocol=protocol)
     assert excinfo.value.as_call_error.errorCode == msgtype_error
     assert excinfo.value.as_call_error.uniqueId == "-1"
+    # Message too long
+    with pytest.raises(exceptions.OCPPException) as excinfo:
+        serializer.parse_structure([2, "19223201", "BootNotification", {}, "extra", "argument"], protocol=protocol)
+    assert excinfo.value.as_call_error.errorCode == common_types.ErrorCodeEnum.ProtocolError
+    assert excinfo.value.as_call_error.uniqueId == "-1"
     # Malformed message
     with pytest.raises(exceptions.OCPPException) as excinfo:
         serializer.parse_structure([2, 666, "this_is_crazy", "stop_this_folly"], protocol=protocol)

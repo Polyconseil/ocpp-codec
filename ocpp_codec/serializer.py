@@ -241,10 +241,18 @@ def parse_structure(raw_data: typing.Any, *, protocol: compat.OcppJsonProtocol) 
         )
 
     msgtype_dataclass = _MSGTYPEID_TO_DATACLASS[msg_type_id]
+    msgtype_fields = fields(msgtype_dataclass)
 
-    # Convert the list to a dict, using the dataclass fields' names as keys. Items in the list are expected to be in
-    # the same order as the dataclass' fields.
-    ocpp_dict = {field.name: value for field, value in zip(fields(msgtype_dataclass), raw_data)}
+    # Since we're converting from a list to a dict based on the defined fields of our dataclasses, we'd simply ignore
+    # extra arguments provided while it's supposed to be an error. Thus we add an explicit check to make sure we reject
+    # messages longer than expected.
+    if len(raw_data) > len(msgtype_fields):
+        logger.warning("%s message contains too many elements", msgtype_dataclass.__name__)
+        raise exceptions.OCPPException(errors.ProtocolError("Too many arguments provided"), _DEFAULT_CALLERROR_UNIQUEID)
+
+    # Convert the list to a dict to be parsed by parse_data, using the dataclass fields' names as keys. Items in the
+    # list are expected to be in the same order as the dataclass' fields.
+    ocpp_dict = {field.name: value for field, value in zip(msgtype_fields, raw_data)}
 
     # as per OCPP 1.6 JSON specification, section 4.2.1, an optional payload can be defined as either the empty
     # object {}, or null. It's easier for us to handle only one, thus convert None to {}.
