@@ -278,7 +278,11 @@ def parse(
             )
             raise exceptions.OCPPException(exc, ocpp_msg.uniqueId)
 
-        payload_dataclass = action_dataclass.req if is_call else action_dataclass.conf
+        if is_call:
+            payload_dataclass = compat.get_request_payload_dataclass(action_dataclass)
+        else:
+            payload_dataclass = compat.get_response_payload_dataclass(action_dataclass)
+
         try:
             ocpp_msg.payload = parse_data(payload_dataclass, ocpp_msg.payload)
         except errors.BaseOCPPError as exc:
