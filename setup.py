@@ -17,7 +17,7 @@ setup(
     name='ocpp-codec',
     version='0.1.0',
     description='OCPP 1.6 and 2.0 messages encoder in Python',
-    python_requires='==3.*,>=3.7.0',
+    python_requires='==3.*,>=3.6.0',
     author='Polyconseil',
     license='BSD-3-Clause',
     packages=['ocpp_codec', 'ocpp_codec.v16', 'ocpp_codec.v20'],
