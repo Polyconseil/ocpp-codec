@@ -83,6 +83,7 @@ max_length_128 = build_simple_validator(max_length, 128)
 max_length_255 = build_simple_validator(max_length, 255)
 max_length_500 = build_simple_validator(max_length, 500)
 max_length_512 = build_simple_validator(max_length, 512)
+max_length_1000 = build_simple_validator(max_length, 1000)
 
 
 def decimal(precision: int, value: float) -> float:

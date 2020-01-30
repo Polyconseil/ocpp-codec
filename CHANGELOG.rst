@@ -4,7 +4,7 @@ Changelog
 0.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- New: Add new OCPP 2.0 messages: ChangeAvailability, GetVariables and SetVariables.
 
 
 0.1.2 (2020-02-13)

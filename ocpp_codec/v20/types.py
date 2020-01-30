@@ -28,6 +28,13 @@ class AuthorizationStatusEnumType(utils.AutoNameEnum):
     Unknown = enum.auto()
 
 
+class AttributeEnumType(utils.AutoNameEnum):
+    Actual = enum.auto()
+    Target = enum.auto()
+    MinSet = enum.auto()
+    MaxSet = enum.auto()
+
+
 class BootReasonEnumType(utils.AutoNameEnum):
     ApplicationReset = enum.auto()
     FirmwareUpdate = enum.auto()
@@ -49,6 +56,20 @@ class CertificateStatusEnumType(utils.AutoNameEnum):
     NoCertificateAvailable = enum.auto()
     CertChainError = enum.auto()
     ContractCancelled = enum.auto()
+
+
+class ChangeAvailabilityStatusEnumType(utils.AutoNameEnum):
+    Accepted = enum.auto()
+    Rejected = enum.auto()
+    Scheduled = enum.auto()
+
+
+class GetVariableStatusEnumType(utils.AutoNameEnum):
+    Accepted = enum.auto()
+    Rejected = enum.auto()
+    UnknownComponent = enum.auto()
+    UnknownVariable = enum.auto()
+    NotSupportedAttributeType = enum.auto()
 
 
 class HashAlgorithmEnumType(utils.AutoNameEnum):
@@ -75,10 +96,26 @@ class MessageFormatEnumType(utils.AutoNameEnum):
     UTF8 = enum.auto()
 
 
+class OperationalStatusEnumType(utils.AutoNameEnum):
+    Inoperative = enum.auto()
+    Operative = enum.auto()
+
+
 class RegistrationStatusEnumType(utils.AutoNameEnum):
     Accepted = enum.auto()
     Pending = enum.auto()
     Rejected = enum.auto()
+
+
+class SetVariableStatusEnumType(utils.AutoNameEnum):
+    Accepted = enum.auto()
+    Rejected = enum.auto()
+    InvalidValue = enum.auto()
+    UnknownComponent = enum.auto()
+    UnknownVariable = enum.auto()
+    NotSupportedAttributeType = enum.auto()
+    OutOfRange = enum.auto()
+    RebootRequired = enum.auto()
 
 
 # Commonly used primitive types aliases
@@ -128,6 +165,11 @@ class _String128(types.SimpleType):
 @dataclass
 class _String512(types.SimpleType):
     value: str = field(metadata={'validator': validators.max_length_512})
+
+
+@dataclass
+class _String1000(types.SimpleType):
+    value: str = field(metadata={'validator': validators.max_length_1000})
 
 
 # Field definitions for tricky cases
@@ -221,3 +263,61 @@ class OCSPRequestDataType(types.ComplexType):
     serialNumber: _String20
 
     responderUrl: _String512 = None
+
+
+@dataclass
+class EVSEType(types.ComplexType):
+    id: int
+
+    connectorId: int = None
+
+
+@dataclass
+class ComponentType(types.ComplexType):
+    name: _String50
+
+    instance: _String50 = None
+    evse: EVSEType = None
+
+
+@dataclass
+class VariableType(types.ComplexType):
+    name: _String50
+
+    instance: _String50 = None
+
+
+@dataclass
+class GetVariableDataType(types.ComplexType):
+    component: ComponentType
+    variable: VariableType
+
+    attributeType: AttributeEnumType = None
+
+
+@dataclass
+class GetVariableResultType(types.ComplexType):
+    attributeStatus: GetVariableStatusEnumType
+    component: ComponentType
+    variable: VariableType
+
+    attributeType: AttributeEnumType = None
+    attributeValue: _String1000 = None
+
+
+@dataclass
+class SetVariableDataType(types.ComplexType):
+    attributeValue: _String1000
+    component: ComponentType
+    variable: VariableType
+
+    attributeType: AttributeEnumType = None
+
+
+@dataclass
+class SetVariableResultType(types.ComplexType):
+    attributeStatus: SetVariableStatusEnumType
+    component: ComponentType
+    variable: VariableType
+
+    attributeType: AttributeEnumType = None

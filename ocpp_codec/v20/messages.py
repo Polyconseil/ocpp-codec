@@ -76,6 +76,27 @@ class BootNotification(Action):
         status: types.RegistrationStatusEnumType
 
 
+class ChangeAvailability(Action):
+    @dataclass
+    class Request:
+        evseId: int
+        operationalStatus: types.OperationalStatusEnumType
+
+    @dataclass
+    class Response:
+        status: types.ChangeAvailabilityStatusEnumType
+
+
+class GetVariables(Action):
+    @dataclass
+    class Request:
+        getVariableData: typing.List[types.GetVariableDataType]
+
+    @dataclass
+    class Response:
+        getVariableResult: typing.List[types.GetVariableResultType]
+
+
 class Heartbeat(Action):
     @dataclass
     class Request:
@@ -84,6 +105,16 @@ class Heartbeat(Action):
     @dataclass
     class Response:
         currentTime: types.DateTime
+
+
+class SetVariables(Action):
+    @dataclass
+    class Request:
+        setVariableData: typing.List[types.SetVariableDataType]
+
+    @dataclass
+    class Response:
+        setVariableResult: typing.List[types.SetVariableResultType]
 
 
 # Every defined Action regrouped in a dict, to easily check whether a specific action is implemented or not.
