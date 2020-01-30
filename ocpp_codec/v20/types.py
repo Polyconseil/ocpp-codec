@@ -85,6 +85,27 @@ class RegistrationStatusEnumType(utils.AutoNameEnum):
 #######################################
 
 @dataclass
+class _IdentifierString20(types.SimpleType):
+    value: str = field(metadata={
+        'validator': validators.compound_validator(validators.max_length_20, validators.is_identifier),
+    })
+
+
+@dataclass
+class _IdentifierString36(types.SimpleType):
+    value: str = field(metadata={
+        'validator': validators.compound_validator(validators.max_length_36, validators.is_identifier),
+    })
+
+
+@dataclass
+class _IdentifierString128(types.SimpleType):
+    value: str = field(metadata={
+        'validator': validators.compound_validator(validators.max_length_128, validators.is_identifier),
+    })
+
+
+@dataclass
 class _String8(types.SimpleType):
     value: str = field(metadata={'validator': validators.max_length_8})
 
@@ -107,27 +128,6 @@ class _String128(types.SimpleType):
 @dataclass
 class _String512(types.SimpleType):
     value: str = field(metadata={'validator': validators.max_length_512})
-
-
-@dataclass
-class _IdentifierString20(types.SimpleType):
-    value: str = field(metadata={
-        'validator': validators.compound_validator(validators.max_length_20, validators.is_identifier),
-    })
-
-
-@dataclass
-class _IdentifierString36(types.SimpleType):
-    value: str = field(metadata={
-        'validator': validators.compound_validator(validators.max_length_36, validators.is_identifier),
-    })
-
-
-@dataclass
-class _IdentifierString128(types.SimpleType):
-    value: str = field(metadata={
-        'validator': validators.compound_validator(validators.max_length_128, validators.is_identifier),
-    })
 
 
 # Field definitions for tricky cases
