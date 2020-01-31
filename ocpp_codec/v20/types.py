@@ -15,7 +15,7 @@ from ocpp_codec import validators
 #######
 
 
-class AuthorizationStatusEnumType(utils.AutoNameEnum):
+class AuthorizationStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Blocked = enum.auto()
     ConcurrentTx = enum.auto()
@@ -28,14 +28,14 @@ class AuthorizationStatusEnumType(utils.AutoNameEnum):
     Unknown = enum.auto()
 
 
-class AttributeEnumType(utils.AutoNameEnum):
+class AttributeEnum(utils.AutoNameEnum):
     Actual = enum.auto()
     Target = enum.auto()
     MinSet = enum.auto()
     MaxSet = enum.auto()
 
 
-class BootReasonEnumType(utils.AutoNameEnum):
+class BootReasonEnum(utils.AutoNameEnum):
     ApplicationReset = enum.auto()
     FirmwareUpdate = enum.auto()
     LocalReset = enum.auto()
@@ -48,7 +48,7 @@ class BootReasonEnumType(utils.AutoNameEnum):
     Description = enum.auto()
 
 
-class CertificateStatusEnumType(utils.AutoNameEnum):
+class CertificateStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     SignatureError = enum.auto()
     CertificateExpired = enum.auto()
@@ -58,13 +58,13 @@ class CertificateStatusEnumType(utils.AutoNameEnum):
     ContractCancelled = enum.auto()
 
 
-class ChangeAvailabilityStatusEnumType(utils.AutoNameEnum):
+class ChangeAvailabilityStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
     Scheduled = enum.auto()
 
 
-class GetVariableStatusEnumType(utils.AutoNameEnum):
+class GetVariableStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
     UnknownComponent = enum.auto()
@@ -72,13 +72,13 @@ class GetVariableStatusEnumType(utils.AutoNameEnum):
     NotSupportedAttributeType = enum.auto()
 
 
-class HashAlgorithmEnumType(utils.AutoNameEnum):
+class HashAlgorithmEnum(utils.AutoNameEnum):
     SHA256 = enum.auto()
     SHA384 = enum.auto()
     SHA512 = enum.auto()
 
 
-class IdTokenEnumType(utils.AutoNameEnum):
+class IdTokenEnum(utils.AutoNameEnum):
     Central = enum.auto()
     eMAID = enum.auto()
     ISO14443 = enum.auto()
@@ -89,25 +89,25 @@ class IdTokenEnumType(utils.AutoNameEnum):
     Description = enum.auto()
 
 
-class MessageFormatEnumType(utils.AutoNameEnum):
+class MessageFormatEnum(utils.AutoNameEnum):
     ASCII = enum.auto()
     HTML = enum.auto()
     URI = enum.auto()
     UTF8 = enum.auto()
 
 
-class OperationalStatusEnumType(utils.AutoNameEnum):
+class OperationalStatusEnum(utils.AutoNameEnum):
     Inoperative = enum.auto()
     Operative = enum.auto()
 
 
-class RegistrationStatusEnumType(utils.AutoNameEnum):
+class RegistrationStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Pending = enum.auto()
     Rejected = enum.auto()
 
 
-class SetVariableStatusEnumType(utils.AutoNameEnum):
+class SetVariableStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
     InvalidValue = enum.auto()
@@ -192,8 +192,68 @@ ListCard4Field = functools.partial(field, metadata={'validator': validators.max_
 ##############
 
 @dataclass
+class AuthorizationStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(AuthorizationStatusEnum)})
+
+
+@dataclass
+class AttributeEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(AttributeEnum)})
+
+
+@dataclass
+class BootReasonEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(BootReasonEnum)})
+
+
+@dataclass
+class CertificateStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(CertificateStatusEnum)})
+
+
+@dataclass
+class ChangeAvailabilityStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(ChangeAvailabilityStatusEnum)})
+
+
+@dataclass
 class DateTime(types.SimpleType):
     value: str = field(metadata={'validator': validators.DateTimeEncoder()})
+
+
+@dataclass
+class GetVariableStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(GetVariableStatusEnum)})
+
+
+@dataclass
+class HashAlgorithmEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(HashAlgorithmEnum)})
+
+
+@dataclass
+class IdTokenEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(IdTokenEnum)})
+
+
+@dataclass
+class MessageFormatEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(MessageFormatEnum)})
+
+
+@dataclass
+class OperationalStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(OperationalStatusEnum)})
+
+
+@dataclass
+class RegistrationStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(RegistrationStatusEnum)})
+
+
+@dataclass
+class SetVariableStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(SetVariableStatusEnum)})
 
 
 # Complex types

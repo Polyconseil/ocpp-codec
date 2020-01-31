@@ -4,6 +4,7 @@ Changelog
 0.1.3 (unreleased)
 ------------------
 
+- Fix: OCPP 2.0 enum types are now correctly defined and parsed.
 - New: Add new OCPP 2.0 messages: ChangeAvailability, GetVariables and SetVariables.
 
 
