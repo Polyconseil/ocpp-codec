@@ -4,6 +4,7 @@ Changelog
 0.1.2 (unreleased)
 ------------------
 
+- Technical: Introduce zest.releaser
 - Fix: Include dataclasses dependency for python 3.6
 - Technical: Move from pyproject.toml to setup.cfg
 
