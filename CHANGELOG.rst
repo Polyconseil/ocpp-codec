@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.3 (unreleased)
+0.1.3 (2020-02-17)
 ------------------
 
 - Fix: OCPP 2.0 enum types are now correctly defined and parsed.
