@@ -104,12 +104,12 @@ class DataTransfer(Action):
     class req(Action.req):
         vendorId: types.CiString255Type
         messageId: types.CiString50Type = None
-        data: bytes = None
+        data: str = None
 
     @dataclass
     class conf(Action.conf):
         status: types.DataTransferStatus
-        data: bytes = None
+        data: str = None
 
 
 class DiagnosticsStatusNotification(Action):
