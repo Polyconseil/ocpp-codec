@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.4 (unreleased)
+0.1.4 (2020-02-28)
 ------------------
 
 - Fix: Change DataTransfer.{req,conf}.data to str instead of bytes (OCPP 1.6)
