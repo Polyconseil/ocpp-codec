@@ -64,6 +64,13 @@ class ChangeAvailabilityStatusEnum(utils.AutoNameEnum):
     Scheduled = enum.auto()
 
 
+class ChargingStateEnum(utils.AutoNameEnum):
+    Charging = enum.auto()
+    EVDetected = enum.auto()
+    SuspendedEV = enum.auto()
+    SuspendedEVSE = enum.auto()
+
+
 class ConnectorStatusEnum(utils.AutoNameEnum):
     Available = enum.auto()
     Occupied = enum.auto()
@@ -182,6 +189,29 @@ class RegistrationStatusEnum(utils.AutoNameEnum):
     Rejected = enum.auto()
 
 
+class ReasonEnum(utils.AutoNameEnum):
+    DeAuthorized = enum.auto()
+    EmergencyStop = enum.auto()
+    EnergyLimitReached = enum.auto()
+    EVDisconnected = enum.auto()
+    GroundFault = enum.auto()
+    ImmediateReset = enum.auto()
+    Local = enum.auto()
+    LocalOutOfCredit = enum.auto()
+    MasterPass = enum.auto()
+    Other = enum.auto()
+    OvercurrentFault = enum.auto()
+    PowerLoss = enum.auto()
+    PowerQuality = enum.auto()
+    Reboot = enum.auto()
+    Remote = enum.auto()
+    SOCLimitReached = enum.auto()
+    StoppedByEV = enum.auto()
+    TimeLimitReached = enum.auto()
+    Timeout = enum.auto()
+    UnlockCommand = enum.auto()
+
+
 class SetVariableStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
@@ -198,6 +228,32 @@ class SignatureMethodEnum(utils.AutoNameEnum):
     ECDSAP384SHA384 = enum.auto()
     ECDSA192SHA256 = enum.auto()
 
+
+class TransactionEventEnum(utils.AutoNameEnum):
+    Ended = enum.auto()
+    Started = enum.auto()
+    Updated = enum.auto()
+
+
+class TriggerReasonEnum(utils.AutoNameEnum):
+    Authorized = enum.auto()
+    CablePluggedIn = enum.auto()
+    ChargingRateChanged = enum.auto()
+    ChargingStateChanged = enum.auto()
+    Deauthorized = enum.auto()
+    EnergyLimitReached = enum.auto()
+    EVCommunicationLost = enum.auto()
+    EVConnectTimeout = enum.auto()
+    MeterValueClock = enum.auto()
+    MeterValuePeriodic = enum.auto()
+    TimeLimitReached = enum.auto()
+    Trigger = enum.auto()
+    UnlockCommand = enum.auto()
+    StopAuthorized = enum.auto()
+    EVDeparted = enum.auto()
+    EVDetected = enum.auto()
+    RemoteStop = enum.auto()
+    RemoteStart = enum.auto()
 
 # Commonly used primitive types aliases
 #######################################
@@ -303,6 +359,11 @@ class ChangeAvailabilityStatusEnumType(types.SimpleType):
 
 
 @dataclass
+class ChargingStateEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(ChargingStateEnum)})
+
+
+@dataclass
 class ConnectorStatusEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(ConnectorStatusEnum)})
 
@@ -368,6 +429,11 @@ class ReadingContextEnumType(types.SimpleType):
 
 
 @dataclass
+class ReasonEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(ReasonEnum)})
+
+
+@dataclass
 class RegistrationStatusEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(RegistrationStatusEnum)})
 
@@ -380,6 +446,16 @@ class SetVariableStatusEnumType(types.SimpleType):
 @dataclass
 class SignatureMethodEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(SignatureMethodEnum)})
+
+
+@dataclass
+class TransactionEventEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(TransactionEventEnum)})
+
+
+@dataclass
+class TriggerReasonEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(TriggerReasonEnum)})
 
 
 @dataclass
@@ -538,3 +614,13 @@ class SetVariableResultType(types.ComplexType):
     variable: VariableType
 
     attributeType: AttributeEnumType = None
+
+
+@dataclass
+class TransactionType(types.ComplexType):
+    id: _IdentifierString36
+
+    chargingState: ChargingStateEnumType = None
+    timeSpentCharging: int = None
+    stoppedReason: ReasonEnumType = None
+    remoteStartId: int = None

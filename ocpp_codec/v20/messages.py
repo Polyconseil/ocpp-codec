@@ -130,6 +130,28 @@ class StatusNotification(Action):
         pass
 
 
+class TransactionEvent(Action):
+    @dataclass
+    class Request:
+        eventType: types.TransactionEventEnumType
+        timestamp: types.DateTime
+        triggerReason: types.TriggerReasonEnumType
+        seqNo: int
+        transactionData: types.TransactionType
+
+        offline: bool = None
+        numberOfPhasesUsed: int = None
+        cableMaxCurrent: types.Decimal = None
+        reservationId: int = None
+        idToken: types.IdTokenType = None
+        evse: types.EVSEType = None
+        meterValue: typing.List[types.MeterValueType] = None
+
+    @dataclass
+    class Response:
+        pass
+
+
 # Every defined Action regrouped in a dict, to easily check whether a specific action is implemented or not.
 IMPLEMENTED = dict(inspect.getmembers(
     sys.modules[__name__],
