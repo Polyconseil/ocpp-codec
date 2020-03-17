@@ -117,6 +117,19 @@ class SetVariables(Action):
         setVariableResult: typing.List[types.SetVariableResultType]
 
 
+class StatusNotification(Action):
+    @dataclass
+    class Request:
+        timestamp: types.DateTime
+        connectorStatus: types.ConnectorStatusEnumType
+        evseId: int
+        connectorId: int
+
+    @dataclass
+    class Response:
+        pass
+
+
 # Every defined Action regrouped in a dict, to easily check whether a specific action is implemented or not.
 IMPLEMENTED = dict(inspect.getmembers(
     sys.modules[__name__],

@@ -64,6 +64,14 @@ class ChangeAvailabilityStatusEnum(utils.AutoNameEnum):
     Scheduled = enum.auto()
 
 
+class ConnectorStatusEnum(utils.AutoNameEnum):
+    Available = enum.auto()
+    Occupied = enum.auto()
+    Reserved = enum.auto()
+    Unavailable = enum.auto()
+    Faulted = enum.auto()
+
+
 class GetVariableStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
@@ -214,6 +222,11 @@ class CertificateStatusEnumType(types.SimpleType):
 @dataclass
 class ChangeAvailabilityStatusEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(ChangeAvailabilityStatusEnum)})
+
+
+@dataclass
+class ConnectorStatusEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(ConnectorStatusEnum)})
 
 
 @dataclass
