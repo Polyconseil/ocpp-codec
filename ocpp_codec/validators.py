@@ -67,7 +67,9 @@ def max_length(length: int, value: typing.Any) -> typing.Any:
     """Validates that an input doesn't exceed a given length."""
     actual_length = len(value)
     if actual_length > length:
-        raise errors.PropertyConstraintViolationError("Input is too long", max_length=length)
+        raise errors.PropertyConstraintViolationError(
+            "Input is too long", max_length=length, actual_length=actual_length,
+        )
     return value
 
 
