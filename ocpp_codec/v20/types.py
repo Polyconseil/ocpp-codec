@@ -72,6 +72,13 @@ class ConnectorStatusEnum(utils.AutoNameEnum):
     Faulted = enum.auto()
 
 
+class EncodingMethodEnum(utils.AutoNameEnum):
+    Other = enum.auto()
+    DLMSMessage = 'DLMS Message'
+    COSEMProtectedData = 'COSEM Protected Data'
+    EDL = enum.auto()
+
+
 class GetVariableStatusEnum(utils.AutoNameEnum):
     Accepted = enum.auto()
     Rejected = enum.auto()
@@ -97,6 +104,42 @@ class IdTokenEnum(utils.AutoNameEnum):
     Description = enum.auto()
 
 
+class LocationEnum(utils.AutoNameEnum):
+    Body = enum.auto()
+    Cable = enum.auto()
+    EV = enum.auto()
+    Inlet = enum.auto()
+    Outlet = enum.auto()
+
+
+class MeasurandEnum(utils.AutoNameEnum):
+    CurrentExport = 'Current.Export'
+    CurrentImport = 'Current.Import'
+    CurrentOffered = 'Current.Offered'
+    EnergyActiveExportRegister = 'Energy.Active.Export.Register'
+    EnergyActiveImportRegister = 'Energy.Active.Import.Register'
+    EnergyReactiveExportRegister = 'Energy.Reactive.Export.Register'
+    EnergyReactiveImportRegister = 'Energy.Reactive.Import.Register'
+    EnergyActiveExportInterval = 'Energy.Active.Export.Interval'
+    EnergyActiveImportInterval = 'Energy.Active.Import.Interval'
+    EnergyActiveNet = 'Energy.Active.Net'
+    EnergyReactiveExportInterval = 'Energy.Reactive.Export.Interval'
+    EnergyReactiveImportInterval = 'Energy.Reactive.Import.Interval'
+    EnergyReactiveNet = 'Energy.Reactive.Net'
+    EnergyApparentNet = 'Energy.Apparent.Net'
+    EnergyApparentImport = 'Energy.Apparent.Import'
+    EnergyApparentExport = 'Energy.Apparent.Export'
+    Frequency = enum.auto()
+    PowerActiveExport = 'Power.Active.Export'
+    PowerActiveImport = 'Power.Active.Import'
+    PowerFactor = 'Power.Factor'
+    PowerOffered = 'Power.Offered'
+    PowerReactiveExport = 'Power.Reactive.Export'
+    PowerReactiveImport = 'Power.Reactive.Import'
+    SoC = enum.auto()
+    Voltage = enum.auto()
+
+
 class MessageFormatEnum(utils.AutoNameEnum):
     ASCII = enum.auto()
     HTML = enum.auto()
@@ -107,6 +150,30 @@ class MessageFormatEnum(utils.AutoNameEnum):
 class OperationalStatusEnum(utils.AutoNameEnum):
     Inoperative = enum.auto()
     Operative = enum.auto()
+
+
+class PhaseEnum(utils.AutoNameEnum):
+    L1 = enum.auto()
+    L2 = enum.auto()
+    L3 = enum.auto()
+    N = enum.auto()
+    L1N = 'L1-N'
+    L2N = 'L2-N'
+    L3N = 'L3-N'
+    L1L2 = 'L1-L2'
+    L2L3 = 'L2-L3'
+    L3L1 = 'L3-L1'
+
+
+class ReadingContextEnum(utils.AutoNameEnum):
+    InterruptionBegin = 'Interruption.Begin'
+    InterruptionEnd = 'Interruption.End'
+    Other = enum.auto()
+    SampleClock = 'Sample.Clock'
+    SamplePeriodic = 'Sample.Periodic'
+    TransactionBegin = 'Transaction.Begin'
+    TransactionEnd = 'Transaction.End'
+    Trigger = enum.auto()
 
 
 class RegistrationStatusEnum(utils.AutoNameEnum):
@@ -124,6 +191,12 @@ class SetVariableStatusEnum(utils.AutoNameEnum):
     NotSupportedAttributeType = enum.auto()
     OutOfRange = enum.auto()
     RebootRequired = enum.auto()
+
+
+class SignatureMethodEnum(utils.AutoNameEnum):
+    ECDSAP256SHA256 = enum.auto()
+    ECDSAP384SHA384 = enum.auto()
+    ECDSA192SHA256 = enum.auto()
 
 
 # Commonly used primitive types aliases
@@ -180,6 +253,11 @@ class _String1000(types.SimpleType):
     value: str = field(metadata={'validator': validators.max_length_1000})
 
 
+@dataclass
+class _String2500(types.SimpleType):
+    value: str = field(metadata={'validator': validators.max_length_2500})
+
+
 # Field definitions for tricky cases
 ####################################
 
@@ -230,8 +308,18 @@ class ConnectorStatusEnumType(types.SimpleType):
 
 
 @dataclass
+class Decimal(types.SimpleType):
+    value: float = field(metadata={'validator': validators.decimal_precision_1})
+
+
+@dataclass
 class DateTime(types.SimpleType):
     value: str = field(metadata={'validator': validators.DateTimeEncoder()})
+
+
+@dataclass
+class EncodingMethodEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(EncodingMethodEnum)})
 
 
 @dataclass
@@ -250,6 +338,16 @@ class IdTokenEnumType(types.SimpleType):
 
 
 @dataclass
+class LocationEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(LocationEnum)})
+
+
+@dataclass
+class MeasurandEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(MeasurandEnum)})
+
+
+@dataclass
 class MessageFormatEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(MessageFormatEnum)})
 
@@ -260,6 +358,16 @@ class OperationalStatusEnumType(types.SimpleType):
 
 
 @dataclass
+class PhaseEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(PhaseEnum)})
+
+
+@dataclass
+class ReadingContextEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(ReadingContextEnum)})
+
+
+@dataclass
 class RegistrationStatusEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(RegistrationStatusEnum)})
 
@@ -267,6 +375,16 @@ class RegistrationStatusEnumType(types.SimpleType):
 @dataclass
 class SetVariableStatusEnumType(types.SimpleType):
     value: str = field(metadata={'validator': validators.EnumEncoder(SetVariableStatusEnum)})
+
+
+@dataclass
+class SignatureMethodEnumType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.EnumEncoder(SignatureMethodEnum)})
+
+
+@dataclass
+class UnitOfMeasureType(types.SimpleType):
+    value: str = field(metadata={'validator': validators.max_length_20})
 
 
 # Complex types
@@ -376,6 +494,32 @@ class GetVariableResultType(types.ComplexType):
 
     attributeType: AttributeEnumType = None
     attributeValue: _String1000 = None
+
+
+@dataclass
+class SignedMeterValueType(types.ComplexType):
+    meterValueSignature: _String2500
+    signatureMethod: SignatureMethodEnumType
+    encodingMethod: EncodingMethodEnumType
+    encodedMeterValue: _String512
+
+
+@dataclass
+class SampledValueType(types.ComplexType):
+    value: Decimal
+
+    context: ReadingContextEnumType = None
+    measurand: MeasurandEnumType = None
+    phase: PhaseEnumType = None
+    location: LocationEnumType = None
+    signedMeterValue: SignedMeterValueType = None
+    unitOfMeasure: UnitOfMeasureType = None
+
+
+@dataclass
+class MeterValueType(types.ComplexType):
+    timestamp: DateTime
+    sampledValue: typing.List[SampledValueType]
 
 
 @dataclass
