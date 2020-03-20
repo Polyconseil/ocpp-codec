@@ -25,7 +25,6 @@ class OCPPException(Exception):
         from .structure import CallError
         from .structure import MessageTypeEnum
         self._call_error = CallError(
-            messageTypeId=MessageTypeEnum.CALLERROR,
             uniqueId=self.related_request_id,
             errorCode=self.ocpp_error.code,
             errorDescription=self.ocpp_error.msg,

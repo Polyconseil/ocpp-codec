@@ -196,6 +196,10 @@ def parse_data(dataclass_class, data):
         else:
             validated_data[field.name] = parse_field(field, data_item)
 
+    if issubclass(dataclass_class, structure.OCPPMessage):
+        # OCPPMessage subclasses already know their messageTypeId and will not accept it as a kwarg.
+        del validated_data['messageTypeId']
+
     return dataclass_class(**validated_data)
 
 

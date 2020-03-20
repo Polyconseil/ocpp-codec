@@ -158,7 +158,6 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
     # Call
     call_msg = serializer.parse_structure([2, "19223201", "DontCare", {"dont": "care"}], protocol=protocol)
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='DontCare',
         payload={'dont': 'care'},
@@ -166,11 +165,7 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
 
     # CallResult
     call_result_msg = serializer.parse_structure([3, "19223201", {"dont": "care"}], protocol=protocol)
-    assert call_result_msg == structure.CallResult(
-        messageTypeId=structure.MessageTypeEnum.CALLRESULT,
-        uniqueId='19223201',
-        payload={'dont': 'care'},
-    )
+    assert call_result_msg == structure.CallResult(uniqueId='19223201', payload={'dont': 'care'})
 
     # CallError
     call_error_msg = serializer.parse_structure(
@@ -178,7 +173,6 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
         protocol=protocol,
     )
     assert call_error_msg == structure.CallError(
-        messageTypeId=structure.MessageTypeEnum.CALLERROR,
         uniqueId='19223201',
         errorCode=common_types.ErrorCodeEnum.GenericError,
         errorDescription='DontCare',
@@ -188,14 +182,12 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
     # Empty payload as {} or null is ok
     call_msg = serializer.parse_structure([2, "19223201", "NoPayloadAction", {}], protocol=protocol)
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='NoPayloadAction',
         payload={},
     )
     call_msg = serializer.parse_structure([2, "19223201", "NoPayloadAction", None], protocol=protocol)
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='NoPayloadAction',
         payload={},
@@ -228,7 +220,6 @@ def test_parse_structure(protocol, rpcframework_error, msgtype_error):
     assert excinfo.value.as_call_error.uniqueId == "-1"
     # Exception can be converted to CallError
     assert excinfo.value.as_call_error == structure.CallError(
-        messageTypeId=structure.MessageTypeEnum.CALLERROR,
         uniqueId='-1',
         errorCode=common_types.ErrorCodeEnum.TypeConstraintViolation,
         errorDescription="Value '666' is not of type 'str' (type is 'int')",
@@ -254,7 +245,6 @@ def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
         protocol=protocol,
     )
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='SimpleAction',
         payload=messages.SimpleAction.req(value='data', validatedValue='data', enumValue=types.FooBarEnum.Foo),
@@ -268,7 +258,6 @@ def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
         protocol=protocol,
     )
     assert call_result_msg == structure.CallResult(
-        messageTypeId=structure.MessageTypeEnum.CALLRESULT,
         uniqueId='19223201',
         payload=messages.SimpleAction.conf(
             value=12,
@@ -282,7 +271,6 @@ def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
         protocol=protocol,
     )
     assert call_error_msg == structure.CallError(
-        messageTypeId=structure.MessageTypeEnum.CALLERROR,
         uniqueId='19223201',
         errorCode=common_types.ErrorCodeEnum.GenericError,
         errorDescription='What a tragedy',
@@ -292,14 +280,12 @@ def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
     # Empty payload as {} or null is ok
     call_msg = serializer.parse([2, "19223201", "NoPayloadAction", {}], protocol=protocol)
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='NoPayloadAction',
         payload=messages.NoPayloadAction.req(),
     )
     call_msg = serializer.parse([2, "19223201", "NoPayloadAction", None], protocol=protocol)
     assert call_msg == structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='NoPayloadAction',
         payload=messages.NoPayloadAction.req(),
@@ -330,7 +316,6 @@ def test_parse(mocker, protocol, rpcframework_error, msgtype_error):
         serializer.parse([2, "19223201", "SimpleAction", {"not_the_right": "payload"}], protocol=protocol)
     # Exception can be converted to CallError
     assert excinfo.value.as_call_error == structure.CallError(
-        messageTypeId=structure.MessageTypeEnum.CALLERROR,
         uniqueId='19223201',
         errorCode=common_types.ErrorCodeEnum.ProtocolError,
         errorDescription="Missing or undefined/empty required fields",
@@ -498,7 +483,6 @@ def test_serialize_fields():
 def test_serialize():
     # Call
     call_msg = structure.Call(
-        messageTypeId=structure.MessageTypeEnum.CALL,
         uniqueId='19223201',
         action='SimpleAction',
         payload=messages.SimpleAction.req(value='data', validatedValue='data', enumValue=types.FooBarEnum.Foo),
@@ -511,7 +495,6 @@ def test_serialize():
 
     # CallResult
     call_result_msg = structure.CallResult(
-        messageTypeId=structure.MessageTypeEnum.CALLRESULT,
         uniqueId='19223201',
         payload=messages.SimpleAction.conf(
             value=12,
@@ -525,7 +508,6 @@ def test_serialize():
 
     # CallError
     call_error_msg = structure.CallError(
-        messageTypeId=structure.MessageTypeEnum.CALLERROR,
         uniqueId='19223201',
         errorCode=common_types.ErrorCodeEnum.GenericError,
         errorDescription='What a tragedy',

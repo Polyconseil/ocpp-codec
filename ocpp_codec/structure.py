@@ -32,7 +32,7 @@ class ErrorCode(types.SimpleType):
 @dataclass
 class OCPPMessage:
     """Base class every OCPP message should inherit from."""
-    messageTypeId: MessageType
+    messageTypeId: MessageType = field(init=False)  # Let subclasses define that field
     uniqueId: str = field(metadata={'validator': validators.max_length_36})
 
 
@@ -42,6 +42,7 @@ class Call(OCPPMessage):
 
     The 'payload' field isn't enforced to a specific type as its parsing relies on the value of 'action'.
     """
+    messageTypeId = MessageTypeEnum.CALL
     action: str
     payload: dict
 
@@ -53,12 +54,14 @@ class CallResult(OCPPMessage):
     The 'payload' field isn't enforced to a specific type as its parsing relies on the value of the associated request's
     'action'.
     """
+    messageTypeId = MessageTypeEnum.CALLRESULT
     payload: dict
 
 
 @dataclass
 class CallError(OCPPMessage):
     """Representation of a CallResult message."""
+    messageTypeId = MessageTypeEnum.CALLERROR
     errorCode: ErrorCode
     errorDescription: str
     errorDetails: dict
