@@ -33,6 +33,9 @@ class ComplexAction:
     @dataclass
     class conf:
         optionalListValue: typing.List[str] = None
+        optionalComplexListValue: typing.List[types.ComplexType] = field(
+            default=None, metadata={'validator': validators.max_length_4},
+        )
 
 
 class NoPayloadAction:

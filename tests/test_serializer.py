@@ -479,6 +479,20 @@ def test_serialize_fields():
                 types.ListElementType(datetimeValue=dt, nestedListValue=[types.ElementType(value='extra_element')]),
             ],
         ))
+    with pytest.raises(errors.PropertyConstraintViolationError):
+        # List of complex types with a violated size constraint on the list itself.
+        serializer.serialize_fields(messages.ComplexAction.conf(
+            optionalComplexListValue=[
+                types.ComplexType(enumValue=types.FooBarEnum.Foo, validatedValue='valid'),
+            ] * 5,
+        ))
+    with pytest.raises(errors.PropertyConstraintViolationError):
+        # List of complex types with a violated size constraint on the sole list's element.
+        serializer.serialize_fields(messages.ComplexAction.conf(
+            optionalComplexListValue=[
+                types.ComplexType(enumValue=types.FooBarEnum.Foo, validatedValue='a' * 21),
+            ],
+        ))
 
 
 def test_serialize():
