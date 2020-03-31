@@ -429,9 +429,17 @@ def test_serialize_fields():
         ],
     }
 
+    # Optional list field, not provided
+    complex_conf_msg = messages.ComplexAction.conf()
+    assert serializer.serialize_fields(complex_conf_msg) == {}
+
     # Optional list field, provided but empty
     complex_conf_msg = messages.ComplexAction.conf(optionalListValue=[])
     assert serializer.serialize_fields(complex_conf_msg) == {}
+
+    # Optional list field, provided with some content
+    complex_req_msg = messages.ComplexAction.conf(optionalListValue=['conf1', 'conf2'])
+    assert serializer.serialize_fields(complex_req_msg) == {'optionalListValue': ['conf1', 'conf2']}
 
     # Test exceptions are propagated
     with pytest.raises(errors.PropertyConstraintViolationError):

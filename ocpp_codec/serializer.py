@@ -400,7 +400,10 @@ def serialize_fields(message):
             field_value = _run_validator(field, field_value, parsing=False)
             # Serialize the list's elements
             field = _unpack_field(field)
-            serialize_func = serialize_fields if issubclass(field.type, types.ComplexType) else serialize_field
+            if issubclass(field.type, types.ComplexType):
+                serialize_func = serialize_fields
+            else:
+                serialize_func = functools.partial(serialize_field, field)
             serialized_dict[field.name] = [serialize_func(element) for element in field_value]
         elif issubclass(field.type, types.ComplexType):
             serialized_dict[field.name] = serialize_fields(field_value)
