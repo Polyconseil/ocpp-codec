@@ -65,3 +65,12 @@ Turn a Python dict (extracted from a JSON string) to an OCPP message dataclass:
     # BootNotification.Response(currentTime=datetime.datetime(2013, 2, 1, 20, 53, 32, 486000, tzinfo=tzutc()), interval=300, status=<RegistrationStatusEnum.Accepted: 'Accepted'>)
 
 As you can see in this example, the post-deserialized payload is a dataclass holding python data types such as ``datetime`` and ``enum.Enum``.
+
+
+Implemented messages
+--------------------
+
+You can find messages implemented for `OCPP version 1.6 here`_ and for `OCPP version 2.0 here`_.
+
+.. _`OCPP version 1.6 here`: https://github.com/Polyconseil/ocpp-codec/blob/master/ocpp_codec/v16/messages.py
+.. _`OCPP version 2.0 here`: https://github.com/Polyconseil/ocpp-codec/blob/master/ocpp_codec/v20/messages.py
