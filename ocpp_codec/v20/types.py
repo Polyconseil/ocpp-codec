@@ -370,7 +370,7 @@ class ConnectorStatusEnumType(types.SimpleType):
 
 @dataclass
 class Decimal(types.SimpleType):
-    value: float = field(metadata={'validator': validators.decimal_precision_1})
+    value: float = field(metadata={'validator': validators.OutgoingMessageDecimalEncoder()})
 
 
 @dataclass

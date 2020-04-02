@@ -17,6 +17,7 @@ is responsible for raising a 'TypeConstraintViolationError' error if it cannot p
 Validators are assigned to a dataclass field through its metadata 'validator' key.
 """
 import datetime
+import decimal
 import functools
 import re
 import typing
@@ -89,14 +90,14 @@ max_length_1000 = build_simple_validator(max_length, 1000)
 max_length_2500 = build_simple_validator(max_length, 2500)
 
 
-def decimal(precision: int, value: float) -> float:
+def decimal_validator(precision: int, value: float) -> float:
     components = str(value).split('.')
     if len(components[-1]) > precision:
         raise errors.PropertyConstraintViolationError("Decimal value precision is too big", precision=precision)
     return value
 
 
-decimal_precision_1 = build_simple_validator(decimal, 1)
+decimal_precision_1 = build_simple_validator(decimal_validator, 1)
 
 
 def is_positive(value: typing.Union[int, float]) -> typing.Union[int, float]:
@@ -216,3 +217,31 @@ class EnumEncoder(BaseEncoder):
                 value=value, enum_class=self.enum_class.__name__,
             )
         return value.value
+
+
+class OutgoingMessageDecimalEncoder(BaseEncoder):
+    """Encoder to limit the precision of decimal values sent to charge points.
+
+    This encoder doesn't restricts the precision of float values received from the charge point, as we *must* keep the
+    full resolution, but limits it to 6 places when sending a value, as required by OCPP 2.0 spec (section 2.1.3).
+    """
+
+    def from_json(self, json_value):
+        return json_value
+
+    def to_json(self, value):
+        try:
+            float_value = float(value)
+        except ValueError:
+            raise errors.TypeConstraintViolationError(f"Input '{value}' cannot be cast to float", value=value)
+
+        six_places = decimal.Decimal('1.000000')
+        try:
+            truncated_value = float(decimal.Decimal(float_value).quantize(six_places, rounding=decimal.ROUND_DOWN))
+        except decimal.DecimalException as exc:
+            raise errors.TypeConstraintViolationError(
+                f"Input '{value}' could not be truncated to six decimal places",
+                value=value,
+            ) from exc
+
+        return truncated_value

@@ -56,8 +56,8 @@ def test_max_length_validators():
 
 def test_decimal_precision_validators():
     with pytest.raises(errors.PropertyConstraintViolationError):
-        validators.decimal(1, 1.23)
-    assert validators.decimal(1, 1.2) == 1.2
+        validators.decimal_validator(1, 1.23)
+    assert validators.decimal_validator(1, 1.2) == 1.2
 
     # Make sure the prepared validators were correctly defined
     with pytest.raises(errors.PropertyConstraintViolationError):
@@ -136,6 +136,23 @@ def test_enum_encoder():
         encoder.to_json('well thats not an enum')
     assert encoder.to_json(TestEnum.A) == 1
     assert encoder.to_json(TestEnum.B) == 'b'
+
+
+def test_outgoing_message_decimal_encoder():
+    encoder = validators.OutgoingMessageDecimalEncoder()
+
+    assert encoder.from_json(1.123456789) == 1.123456789
+
+    with pytest.raises(errors.TypeConstraintViolationError):
+        encoder.to_json('well thats not a float')
+    with pytest.raises(errors.TypeConstraintViolationError):
+        # Too big
+        assert encoder.to_json('112345599999999994030193027055616.1234567890')
+
+    assert encoder.to_json('1.12') == 1.12
+    assert encoder.to_json('1.123456789') == 1.123456
+    assert encoder.to_json('0.00001') == 1e-05
+    assert encoder.to_json('1e-05') == 1e-05
 
 
 def test_compound_validator():

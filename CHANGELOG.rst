@@ -4,6 +4,7 @@ Changelog
 0.1.5 (unreleased)
 ------------------
 
+- Fix: Limit decimal values to 6 places when sending a value to a charging station
 - New: Add usage examples to README.rst.
 - Technical: Make OCPPMessage.messageTypeId a class attribute to make instantiation easier.
 - Fix: Serialization of List[non-ComplexType] fields.
