@@ -1,6 +1,9 @@
 ocpp-codec - OCPP messages encoder-decoder
 ==========================================
 
+.. image:: https://secure.travis-ci.org/Polyconseil/ocpp-codec.png?branch=lburg/setting_up_travis
+    :target: http://travis-ci.org/Polyconseil/ocpp-codec/
+
 *ocpp-codec* provides dataclasses definitions of OCPP messages and types, in both version 1.6 and 2.0 of the protocol.
 
 It also provides a JSON pre-serializer and post-deserializer to exchange messages (see below).
