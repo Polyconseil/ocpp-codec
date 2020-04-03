@@ -5,6 +5,7 @@ from dataclasses import field
 import enum
 import typing
 
+from ocpp_codec import encoders
 from ocpp_codec import types
 from ocpp_codec import utils
 from ocpp_codec import validators
@@ -27,12 +28,12 @@ class SeveralValidatorsType(types.SimpleType):
 
 @dataclass
 class DateTimeType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.DateTimeEncoder()})
+    value: str = field(metadata={'encoder': encoders.DateTimeEncoder()})
 
 
 @dataclass
 class EnumType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(FooBarEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(FooBarEnum)})
 
 
 @dataclass

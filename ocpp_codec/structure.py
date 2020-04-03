@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from dataclasses import field
 import enum
 
+from ocpp_codec import encoders
 from ocpp_codec import types
 from ocpp_codec import validators
 
@@ -20,13 +21,13 @@ class MessageTypeEnum(enum.Enum):
 @dataclass
 class MessageType(types.SimpleType):
     """Field type coercing an integer to a MessageTypeEnum."""
-    value: int = field(metadata={'validators': validators.EnumEncoder(MessageTypeEnum)})
+    value: int = field(metadata={'encoder': encoders.EnumEncoder(MessageTypeEnum)})
 
 
 @dataclass
 class ErrorCode(types.SimpleType):
     """Field type coercing a string to a ErrorCodeEnum."""
-    value: str = field(metadata={'validators': validators.EnumEncoder(types.ErrorCodeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(types.ErrorCodeEnum)})
 
 
 @dataclass

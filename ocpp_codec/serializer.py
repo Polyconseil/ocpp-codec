@@ -1,5 +1,5 @@
 # Copyright (c) Polyconseil SAS. All rights reserved.
-"""OCPP-JSON serialization, parsing and validation."""
+"""OCPP-JSON serialization, parsing and cleaning (validation and encoding)."""
 import copy
 import dataclasses
 from dataclasses import fields
@@ -10,6 +10,7 @@ import sys
 import typing
 
 from ocpp_codec import compat
+from ocpp_codec import encoders
 from ocpp_codec import errors
 from ocpp_codec import exceptions
 from ocpp_codec import structure
@@ -33,26 +34,34 @@ def _required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
     return [field for field in fields(dataclass_class) if not _is_optional(field)]
 
 
-def _run_validator(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
+def _clean_data(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
     # Fetch the validators to run
     validator_list = field.metadata.get('validators', [validators.noop])
     # Defining a single validator is supported, turn it to a list for easier processing
     if not isinstance(validator_list, list):
         validator_list = [validator_list]
 
-    validated_data = data
     for validator in validator_list:
-        if isinstance(validator, validators.BaseEncoder):
-            # Pick the right method based on whether we're parsing a message, or serializing a field
-            validator = validator.from_json if parsing else validator.to_json
-
         try:
-            validated_data = validator(data)
+            validator(data)
         except errors.BaseOCPPError as exc:
             # Inject field data in exception, as the validator doesn't know the field's name
             exc.details.setdefault('field', field.name)
             raise exc
-    return validated_data
+
+    # Fetch the defined encoder if it exists
+    encoder = field.metadata.get('encoder')
+    # No encoder, data is valid as-is
+    if not encoder:
+        return data
+
+    # Pick the right method based on whether we're parsing a message, or serializing a field
+    if parsing:
+        cleaned_data = encoder.from_json(data)
+    else:
+        cleaned_data = encoder.to_json(data)
+
+    return cleaned_data
 
 
 # Both _is_list and _is_generic use some private API, beware. There exists a third-party library
@@ -102,15 +111,15 @@ def _extract_base_type(field: dataclasses.Field) -> dataclasses.Field:
 def parse_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
     """Tries to fit a JSON object into a dataclass field.
 
-    Makes sure the data received from the network connection is of the expected type, before validation.
+    Makes sure the data received from the network connection is of the expected type, before cleaning.
 
     Args:
         - field: dataclasses.Field, the field to match the data against
         - data: object, any kind of data retrieved from the OCPP-JSON message (string, integer, list, dict, etc.)
 
     Returns:
-        object, a validated piece of data, ran through the field's validator and maybe converted to a more convenient
-        type.
+        object, a cleaned piece of data, ran through the field's validators and encoder, and maybe converted to a more
+        convenient type.
 
     Raises:
         - errors.TypeConstraintViolationError
@@ -125,7 +134,7 @@ def parse_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
         )
 
     # Will raise if fails
-    return _run_validator(field, data, parsing=True)
+    return _clean_data(field, data, parsing=True)
 
 
 def parse_data(dataclass_class, data):
@@ -170,7 +179,7 @@ def parse_data(dataclass_class, data):
         )
 
     # Match every piece of data against the dataclass fields
-    validated_data = {}
+    cleaned_data = {}
     for field in dataclass_fields:
         # Skip optional undefined or non-provided fields
         if _is_optional(field) and (field.name not in data or _is_undefined(field, data[field.name])):
@@ -183,29 +192,29 @@ def parse_data(dataclass_class, data):
 
         data_item = data[field.name]
         if is_dataclass(field.type):
-            validated_data[field.name] = parse_data(field.type, data_item)
+            cleaned_data[field.name] = parse_data(field.type, data_item)
         elif _is_list(field.type):
             if not isinstance(data_item, list):
                 raise errors.TypeConstraintViolationError(
                     f"Field '{field.name}' is not a list (type is {type(data_item).__name__}",
                 )
-            # Run validator on the list attribute itself, before iterating over its elements
-            data_item = _run_validator(field, data_item, parsing=True)
+            # Run validators and encoder on the list attribute itself, before iterating over its elements
+            data_item = _clean_data(field, data_item, parsing=True)
             # Parse the list's elements
             field = _unpack_field(field)
             if is_dataclass(field.type):
                 parse_func = functools.partial(parse_data, field.type)
             else:
                 parse_func = functools.partial(parse_field, field)
-            validated_data[field.name] = [parse_func(element) for element in data_item]
+            cleaned_data[field.name] = [parse_func(element) for element in data_item]
         else:
-            validated_data[field.name] = parse_field(field, data_item)
+            cleaned_data[field.name] = parse_field(field, data_item)
 
     if issubclass(dataclass_class, structure.OCPPMessage):
         # OCPPMessage subclasses already know their messageTypeId and will not accept it as a kwarg.
-        del validated_data['messageTypeId']
+        del cleaned_data['messageTypeId']
 
-    return dataclass_class(**validated_data)
+    return dataclass_class(**cleaned_data)
 
 
 _MSGTYPEID_TO_DATACLASS = {
@@ -338,7 +347,7 @@ def parse(
 def serialize_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
     """Serializes a data element against a dataclass field.
 
-    Makes sure the data going out onto the network is of the expected type, after validation.
+    Makes sure the data going out onto the network is of the expected type, after cleaning.
 
     Args:
         - field: dataclasses.Field, the field to match the data against
@@ -356,27 +365,27 @@ def serialize_field(field: dataclasses.Field, data: typing.Any) -> typing.Any:
         field = _extract_base_type(field)
 
     try:
-        validated_data = _run_validator(field, data, parsing=False)
+        cleaned_data = _clean_data(field, data, parsing=False)
     except errors.BaseOCPPError:
-        logger.warning("Failed to validate field '%s' with input '%s'", field.name, data)
+        logger.warning("Failed to clean field '%s' with input '%s'", field.name, data)
         raise
 
-    # We only check the field's type after validating, as the validator is very likely to convert the initial type
+    # We only check the field's type after cleaning, as an encoder is very likely to convert the initial type
     # (e.g.: datetime->str or Enum->int).
-    if not isinstance(validated_data, field.type):
+    if not isinstance(cleaned_data, field.type):
         raise errors.TypeConstraintViolationError(
-            f"Item '{validated_data}' is not of type '{field.type}' (type is '{type(validated_data)}')",
+            f"Item '{cleaned_data}' is not of type '{field.type}' (type is '{type(cleaned_data)}')",
             item=data, field=field.name,
         )
 
-    return validated_data
+    return cleaned_data
 
 
 def serialize_fields(message):
     """Serializes a whole OCPP 'Action.req' or 'Action.conf' based on the dataclass fields.
 
     Basically serializes every field in order, and return a dict of it all. Can be seen as an equivalent to
-    'dataclasses.asdict()', running additional validation based on the message's dataclass fields.
+    'dataclasses.asdict()', running additional cleaning (validators and encoder) based on the message's dataclass fields.
 
     Recursively serializes nested dataclasses.
 
@@ -397,7 +406,7 @@ def serialize_fields(message):
         if _is_undefined(field, field_value) and _is_optional(field):
             continue
         # This provides a more helpful error than letting the serializing code hit a None field value and yield a
-        # validator error. However, this is highly unlikely we'll ever run into this case when using this module
+        # cleaning error. However, this is highly unlikely we'll ever run into this case when using this module
         # properly.
         if _is_undefined(field, field_value) and not _is_optional(field):
             raise errors.ProtocolError(f"Undefined required field '{field.name}'")
@@ -405,8 +414,8 @@ def serialize_fields(message):
         # Must be done first, as issubclass doesn't support being called with typing.List as its first argument (it's
         # not a class)
         if _is_list(field.type):
-            # Run validator on the list attribute itself, before iterating over its elements
-            field_value = _run_validator(field, field_value, parsing=False)
+            # Clean the list attribute itself, before iterating over its elements
+            field_value = _clean_data(field, field_value, parsing=False)
             # Serialize the list's elements
             field = _unpack_field(field)
             if issubclass(field.type, types.ComplexType):

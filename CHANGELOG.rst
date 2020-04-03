@@ -4,6 +4,7 @@ Changelog
 0.1.5 (unreleased)
 ------------------
 
+- New: Add a dedicated 'encoder' metadata attribute on fields instead of mixing it with validators.
 - Fix: Limit decimal values to 6 places when sending a value to a charging station
 - New: Add usage examples to README.rst.
 - Technical: Make OCPPMessage.messageTypeId a class attribute to make instantiation easier.

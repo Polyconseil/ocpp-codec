@@ -5,6 +5,7 @@ from dataclasses import field
 import enum
 import typing
 
+from ocpp_codec import encoders
 from ocpp_codec import types
 from ocpp_codec import utils
 from ocpp_codec import validators
@@ -255,47 +256,47 @@ class ValueFormatEnum(utils.AutoNameEnum):
 
 @dataclass
 class AuthorizationStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(AuthorizationStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(AuthorizationStatusEnum)})
 
 
 @dataclass
 class AvailabilityStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(AvailabilityStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(AvailabilityStatusEnum)})
 
 
 @dataclass
 class AvailabilityType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(AvailabilityTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(AvailabilityTypeEnum)})
 
 
 @dataclass
 class ConfigurationStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ConfigurationStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ConfigurationStatusEnum)})
 
 
 @dataclass
 class ChargePointErrorCode(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ChargePointErrorCodeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ChargePointErrorCodeEnum)})
 
 
 @dataclass
 class ChargePointStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ChargePointStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ChargePointStatusEnum)})
 
 
 @dataclass
 class ChargingProfileKindType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ChargingProfileKindTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ChargingProfileKindTypeEnum)})
 
 
 @dataclass
 class ChargingProfilePurposeType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ChargingProfilePurposeTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ChargingProfilePurposeTypeEnum)})
 
 
 @dataclass
 class ChargingRateUnitType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ChargingRateUnitTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ChargingRateUnitTypeEnum)})
 
 
 @dataclass
@@ -325,17 +326,17 @@ class CiString500Type(types.SimpleType):
 
 @dataclass
 class DataTransferStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(DataTransferStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(DataTransferStatusEnum)})
 
 
 @dataclass
 class DiagnosticsStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(DiagnosticsStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(DiagnosticsStatusEnum)})
 
 
 @dataclass
 class DateTime(types.SimpleType):
-    value: str = field(metadata={'validators': validators.DateTimeEncoder()})
+    value: str = field(metadata={'encoder': encoders.DateTimeEncoder()})
 
 
 @dataclass
@@ -345,7 +346,7 @@ class Decimal(types.SimpleType):
 
 @dataclass
 class FirmwareStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(FirmwareStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(FirmwareStatusEnum)})
 
 
 @dataclass
@@ -355,12 +356,12 @@ class IdToken(CiString20Type):
 
 @dataclass
 class Location(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(LocationEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(LocationEnum)})
 
 
 @dataclass
 class Measurand(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(MeasurandEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(MeasurandEnum)})
 
 
 @dataclass
@@ -375,62 +376,62 @@ class PositiveIntegerNonNull(types.SimpleType):
 
 @dataclass
 class Phase(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(PhaseEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(PhaseEnum)})
 
 
 @dataclass
 class ReadingContext(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ReadingContextEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ReadingContextEnum)})
 
 
 @dataclass
 class Reason(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ReasonEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ReasonEnum)})
 
 
 @dataclass
 class RecurrencyKindType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(RecurrencyKindTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(RecurrencyKindTypeEnum)})
 
 
 @dataclass
 class RegistrationStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(RegistrationStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(RegistrationStatusEnum)})
 
 
 @dataclass
 class RemoteStartStopStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(RemoteStartStopStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(RemoteStartStopStatusEnum)})
 
 
 @dataclass
 class ReservationStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ReservationStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ReservationStatusEnum)})
 
 
 @dataclass
 class UnitOfMeasure(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(UnitOfMeasureEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(UnitOfMeasureEnum)})
 
 
 @dataclass
 class UnlockStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(UnlockStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(UnlockStatusEnum)})
 
 
 @dataclass
 class UpdateStatus(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(UpdateStatusEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(UpdateStatusEnum)})
 
 
 @dataclass
 class UpdateType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(UpdateTypeEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(UpdateTypeEnum)})
 
 
 @dataclass
 class ValueFormat(types.SimpleType):
-    value: str = field(metadata={'validators': validators.EnumEncoder(ValueFormatEnum)})
+    value: str = field(metadata={'encoder': encoders.EnumEncoder(ValueFormatEnum)})
 
 
 # Complex types
