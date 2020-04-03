@@ -14,7 +14,7 @@ Encoders shouldn't run any type checking when parsing ('from_json'), but should 
 because there might be several Python types that can be coerced into the correct OCPP-JSON type required. The validator
 is responsible for raising a 'TypeConstraintViolationError' error if it cannot process the input.
 
-Validators are assigned to a dataclass field through its metadata 'validator' key.
+Validators are assigned to a dataclass field through its metadata 'validators' key.
 """
 import datetime
 import decimal

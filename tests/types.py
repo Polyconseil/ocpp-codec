@@ -17,17 +17,17 @@ class FooBarEnum(utils.AutoNameEnum):
 
 @dataclass
 class ValidatedType(types.SimpleType):
-    value: str = field(metadata={'validator': validators.max_length_20})
+    value: str = field(metadata={'validators': validators.max_length_20})
 
 
 @dataclass
 class DateTimeType(types.SimpleType):
-    value: str = field(metadata={'validator': validators.DateTimeEncoder()})
+    value: str = field(metadata={'validators': validators.DateTimeEncoder()})
 
 
 @dataclass
 class EnumType(types.SimpleType):
-    value: str = field(metadata={'validator': validators.EnumEncoder(FooBarEnum)})
+    value: str = field(metadata={'validators': validators.EnumEncoder(FooBarEnum)})
 
 
 @dataclass

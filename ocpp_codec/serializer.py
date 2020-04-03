@@ -35,7 +35,7 @@ def _required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
 
 def _run_validator(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
     # Fetch the validator to run
-    validator = field.metadata.get('validator', validators.noop)
+    validator = field.metadata.get('validators', validators.noop)
     if isinstance(validator, validators.BaseEncoder):
         # Pick the right method based on whether we're parsing a message, or serializing a field
         validator = validator.from_json if parsing else validator.to_json

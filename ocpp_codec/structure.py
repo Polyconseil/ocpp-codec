@@ -20,20 +20,20 @@ class MessageTypeEnum(enum.Enum):
 @dataclass
 class MessageType(types.SimpleType):
     """Field type coercing an integer to a MessageTypeEnum."""
-    value: int = field(metadata={'validator': validators.EnumEncoder(MessageTypeEnum)})
+    value: int = field(metadata={'validators': validators.EnumEncoder(MessageTypeEnum)})
 
 
 @dataclass
 class ErrorCode(types.SimpleType):
     """Field type coercing a string to a ErrorCodeEnum."""
-    value: str = field(metadata={'validator': validators.EnumEncoder(types.ErrorCodeEnum)})
+    value: str = field(metadata={'validators': validators.EnumEncoder(types.ErrorCodeEnum)})
 
 
 @dataclass
 class OCPPMessage:
     """Base class every OCPP message should inherit from."""
     messageTypeId: MessageType = field(init=False)  # Let subclasses define that field
-    uniqueId: str = field(metadata={'validator': validators.max_length_36})
+    uniqueId: str = field(metadata={'validators': validators.max_length_36})
 
 
 @dataclass

@@ -26,7 +26,7 @@ class ComplexAction:
     @dataclass
     class req:
         complexValue: types.ComplexType
-        listValue: typing.List[types.ListElementType] = field(metadata={'validator': validators.max_length_4})
+        listValue: typing.List[types.ListElementType] = field(metadata={'validators': validators.max_length_4})
 
         optionalValue: str = None
 
@@ -34,7 +34,7 @@ class ComplexAction:
     class conf:
         optionalListValue: typing.List[str] = None
         optionalComplexListValue: typing.List[types.ComplexType] = field(
-            default=None, metadata={'validator': validators.max_length_4},
+            default=None, metadata={'validators': validators.max_length_4},
         )
 
 
