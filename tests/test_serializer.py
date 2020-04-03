@@ -29,6 +29,15 @@ def test_parse_field():
     with pytest.raises(errors.TypeConstraintViolationError):
         serializer.parse_field(validated_field, 123)
 
+    # Multiple validators are applied in sequence
+    positive_float_field = fields(types.SeveralValidatorsType)[0]
+    with pytest.raises(errors.PropertyConstraintViolationError):
+        serializer.parse_field(positive_float_field, -2.1)
+    with pytest.raises(errors.PropertyConstraintViolationError):
+        serializer.parse_field(positive_float_field, 2.12)
+    validated_data = serializer.parse_field(positive_float_field, 2.1)
+    assert validated_data == 2.1
+
     # Check that a field with an encoder converts the type accordingly
     datetime_field = fields(types.DateTimeType)[0]
     dt = serializer.parse_field(datetime_field, '2019-01-30T12:30:00Z')

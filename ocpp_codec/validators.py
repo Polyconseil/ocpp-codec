@@ -31,15 +31,6 @@ from ocpp_codec import errors
 ###########
 # Utilities
 
-def compound_validator(*validators: typing.Callable[[typing.Any], typing.Any]):
-    """Run several validators on the same input data."""
-    def _validator(value):
-        for v in validators:
-            value = v(value)
-        return value
-    return _validator
-
-
 def build_simple_validator(func: typing.Callable, *args, **kwargs) -> typing.Callable[[typing.Any], typing.Any]:
     """Build a ready-to-use simple validator out of a function.
 
@@ -110,9 +101,6 @@ def is_not_zero(value: typing.Union[int, float]) -> typing.Union[int, float]:
     if value == 0:
         raise errors.PropertyConstraintViolationError("Input is zero")
     return value
-
-
-is_strictly_positive = compound_validator(is_positive, is_not_zero)
 
 
 _IDENTIFIER_REGEXP = re.compile('[a-zA-Z0-9' + re.escape('*_=:+|@.-') + ']*')

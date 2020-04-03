@@ -370,7 +370,7 @@ class PositiveInteger(types.SimpleType):
 
 @dataclass
 class PositiveIntegerNonNull(types.SimpleType):
-    value: int = field(metadata={'validators': validators.is_strictly_positive})
+    value: int = field(metadata={'validators': [validators.is_positive, validators.is_not_zero]})
 
 
 @dataclass

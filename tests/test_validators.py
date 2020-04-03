@@ -76,12 +76,6 @@ def test_is_positive_validators():
     assert validators.is_not_zero(-1) == -1
     assert validators.is_not_zero(1) == 1
 
-    with pytest.raises(errors.PropertyConstraintViolationError):
-        validators.is_strictly_positive(-1)
-    with pytest.raises(errors.PropertyConstraintViolationError):
-        validators.is_strictly_positive(0)
-    assert validators.is_strictly_positive(1) == 1
-
 
 def test_is_identifier():
     with pytest.raises(errors.PropertyConstraintViolationError):
@@ -153,12 +147,3 @@ def test_outgoing_message_decimal_encoder():
     assert encoder.to_json('1.123456789') == 1.123456
     assert encoder.to_json('0.00001') == 1e-05
     assert encoder.to_json('1e-05') == 1e-05
-
-
-def test_compound_validator():
-    validator = validators.compound_validator(validators.is_positive, validators.decimal_precision_1)
-    with pytest.raises(errors.PropertyConstraintViolationError):
-        validator(-2.1)
-    with pytest.raises(errors.PropertyConstraintViolationError):
-        validator(2.12)
-    assert validator(2.1) == 2.1

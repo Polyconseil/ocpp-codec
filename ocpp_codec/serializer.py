@@ -34,20 +34,25 @@ def _required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
 
 
 def _run_validator(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
-    # Fetch the validator to run
-    validator = field.metadata.get('validators', validators.noop)
-    if isinstance(validator, validators.BaseEncoder):
-        # Pick the right method based on whether we're parsing a message, or serializing a field
-        validator = validator.from_json if parsing else validator.to_json
+    # Fetch the validators to run
+    validator_list = field.metadata.get('validators', [validators.noop])
+    # Defining a single validator is supported, turn it to a list for easier processing
+    if not isinstance(validator_list, list):
+        validator_list = [validator_list]
 
-    try:
-        validated_data = validator(data)
-    except errors.BaseOCPPError as exc:
-        # Inject field data in exception, as the validator doesn't know the field's name
-        exc.details.setdefault('field', field.name)
-        raise exc
-    else:
-        return validated_data
+    validated_data = data
+    for validator in validator_list:
+        if isinstance(validator, validators.BaseEncoder):
+            # Pick the right method based on whether we're parsing a message, or serializing a field
+            validator = validator.from_json if parsing else validator.to_json
+
+        try:
+            validated_data = validator(data)
+        except errors.BaseOCPPError as exc:
+            # Inject field data in exception, as the validator doesn't know the field's name
+            exc.details.setdefault('field', field.name)
+            raise exc
+    return validated_data
 
 
 # Both _is_list and _is_generic use some private API, beware. There exists a third-party library

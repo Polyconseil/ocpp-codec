@@ -21,6 +21,11 @@ class ValidatedType(types.SimpleType):
 
 
 @dataclass
+class SeveralValidatorsType(types.SimpleType):
+    value: float = field(metadata={'validators': [validators.is_positive, validators.decimal_precision_1]})
+
+
+@dataclass
 class DateTimeType(types.SimpleType):
     value: str = field(metadata={'validators': validators.DateTimeEncoder()})
 

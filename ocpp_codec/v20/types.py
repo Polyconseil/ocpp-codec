@@ -255,27 +255,28 @@ class TriggerReasonEnum(utils.AutoNameEnum):
     RemoteStop = enum.auto()
     RemoteStart = enum.auto()
 
+
 # Commonly used primitive types aliases
 #######################################
 
 @dataclass
 class _IdentifierString20(types.SimpleType):
     value: str = field(metadata={
-        'validators': validators.compound_validator(validators.max_length_20, validators.is_identifier),
+        'validators': [validators.max_length_20, validators.is_identifier],
     })
 
 
 @dataclass
 class _IdentifierString36(types.SimpleType):
     value: str = field(metadata={
-        'validators': validators.compound_validator(validators.max_length_36, validators.is_identifier),
+        'validators': [validators.max_length_36, validators.is_identifier],
     })
 
 
 @dataclass
 class _IdentifierString128(types.SimpleType):
     value: str = field(metadata={
-        'validators': validators.compound_validator(validators.max_length_128, validators.is_identifier),
+        'validators': [validators.max_length_128, validators.is_identifier],
     })
 
 
