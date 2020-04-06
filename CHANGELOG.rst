@@ -4,7 +4,10 @@ Changelog
 0.1.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- New: Add usage examples to README.rst.
+- Technical: Make OCPPMessage.messageTypeId a class attribute to make instantiation easier.
+- Fix: Serialization of List[non-ComplexType] fields.
+- New: Add OCPP 2.0 messages: TransactionEvent.{Request,Response} and underlying messages.
 
 
 0.1.4 (2020-02-28)
