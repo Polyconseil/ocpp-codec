@@ -11,6 +11,7 @@ responsible for raising a 'TypeConstraintViolationError' error if they cannot pr
 
 Encoders are assigned to a dataclass field through its metadata 'encoder' key. Only a single encoder is accepted.
 """
+import abc
 import datetime
 import decimal
 import typing
@@ -21,13 +22,15 @@ import pytz
 from ocpp_codec import errors
 
 
-class BaseEncoder:
+class BaseEncoder(abc.ABC):
     """Base encoder from type A to B."""
 
+    @abc.abstractmethod
     def from_json(self, json_value: typing.Any) -> typing.Any:
         """Encoding function handling conversion from OCPP-JSON to Python types."""
         raise NotImplementedError
 
+    @abc.abstractmethod
     def to_json(self, value: typing.Any) -> typing.Any:
         """Encoding function handling conversion from Python types to OCPP-JSON."""
         raise NotImplementedError
