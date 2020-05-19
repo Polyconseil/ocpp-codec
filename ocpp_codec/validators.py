@@ -41,11 +41,6 @@ def build_simple_validator(func: typing.Callable, *args, **kwargs) -> typing.Cal
 ############
 # Validators
 
-def noop(value: typing.Any) -> typing.Any:
-    """A no-op validator, used as a default validator when none is specified."""
-    return value
-
-
 def max_length(length: int, value: typing.Any) -> typing.Any:
     """Validates that an input doesn't exceed a given length."""
     actual_length = len(value)

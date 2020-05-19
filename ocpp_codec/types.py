@@ -30,7 +30,7 @@ class SimpleType(OCPPType):
 
         @dataclass
         class CiString20Type(SimpleType):
-            value: str = field(metadata={'validators': validators.max_length_20})
+            value: str = field(metadata={'validators': [validators.max_length_20]})
 
         When used as part of another type, CiString20Type is expected to be a string of length 20.
     """

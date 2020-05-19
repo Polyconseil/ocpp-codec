@@ -14,10 +14,6 @@ def test_build_simple_validator():
     assert validator('test') == ('arg', 'test')
 
 
-def test_noop():
-    assert validators.noop('value') == 'value'
-
-
 def test_max_length_validators():
     with pytest.raises(errors.PropertyConstraintViolationError):
         validators.max_length(10, 'a' * 11)

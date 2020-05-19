@@ -301,27 +301,27 @@ class ChargingRateUnitType(types.SimpleType):
 
 @dataclass
 class CiString20Type(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_20})
+    value: str = field(metadata={'validators': [validators.max_length_20]})
 
 
 @dataclass
 class CiString25Type(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_25})
+    value: str = field(metadata={'validators': [validators.max_length_25]})
 
 
 @dataclass
 class CiString50Type(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_50})
+    value: str = field(metadata={'validators': [validators.max_length_50]})
 
 
 @dataclass
 class CiString255Type(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_255})
+    value: str = field(metadata={'validators': [validators.max_length_255]})
 
 
 @dataclass
 class CiString500Type(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_500})
+    value: str = field(metadata={'validators': [validators.max_length_500]})
 
 
 @dataclass
@@ -341,7 +341,7 @@ class DateTime(types.SimpleType):
 
 @dataclass
 class Decimal(types.SimpleType):
-    value: float = field(metadata={'validators': validators.decimal_precision_1})
+    value: float = field(metadata={'validators': [validators.decimal_precision_1]})
 
 
 @dataclass
@@ -366,7 +366,7 @@ class Measurand(types.SimpleType):
 
 @dataclass
 class PositiveInteger(types.SimpleType):
-    value: int = field(metadata={'validators': validators.is_positive})
+    value: int = field(metadata={'validators': [validators.is_positive]})
 
 
 @dataclass

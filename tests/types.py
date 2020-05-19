@@ -18,7 +18,7 @@ class FooBarEnum(utils.AutoNameEnum):
 
 @dataclass
 class ValidatedType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_20})
+    value: str = field(metadata={'validators': [validators.max_length_20]})
 
 
 @dataclass

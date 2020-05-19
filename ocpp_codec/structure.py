@@ -34,7 +34,7 @@ class ErrorCode(types.SimpleType):
 class OCPPMessage:
     """Base class every OCPP message should inherit from."""
     messageTypeId: MessageType = field(init=False)  # Let subclasses define that field
-    uniqueId: str = field(metadata={'validators': validators.max_length_36})
+    uniqueId: str = field(metadata={'validators': [validators.max_length_36]})
 
 
 @dataclass

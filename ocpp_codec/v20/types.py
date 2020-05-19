@@ -283,37 +283,37 @@ class _IdentifierString128(types.SimpleType):
 
 @dataclass
 class _String8(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_8})
+    value: str = field(metadata={'validators': [validators.max_length_8]})
 
 
 @dataclass
 class _String20(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_20})
+    value: str = field(metadata={'validators': [validators.max_length_20]})
 
 
 @dataclass
 class _String50(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_50})
+    value: str = field(metadata={'validators': [validators.max_length_50]})
 
 
 @dataclass
 class _String128(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_128})
+    value: str = field(metadata={'validators': [validators.max_length_128]})
 
 
 @dataclass
 class _String512(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_512})
+    value: str = field(metadata={'validators': [validators.max_length_512]})
 
 
 @dataclass
 class _String1000(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_1000})
+    value: str = field(metadata={'validators': [validators.max_length_1000]})
 
 
 @dataclass
 class _String2500(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_2500})
+    value: str = field(metadata={'validators': [validators.max_length_2500]})
 
 
 # Field definitions for tricky cases
@@ -329,7 +329,7 @@ class _String2500(types.SimpleType):
 # doesn't work because ListCard4[int] for example isn't considered a dataclass, while ListCard4 is, but extracting the
 # type of the 'value' field yields, quite naturally, ~T. We'd like to be able to extract the concrete type of a
 # ListCard4[int] along with the field validators.
-ListCard4Field = functools.partial(field, metadata={'validators': validators.max_length_4})
+ListCard4Field = functools.partial(field, metadata={'validators': [validators.max_length_4]})
 
 
 # Simple types
@@ -462,7 +462,7 @@ class TriggerReasonEnumType(types.SimpleType):
 
 @dataclass
 class UnitOfMeasureType(types.SimpleType):
-    value: str = field(metadata={'validators': validators.max_length_20})
+    value: str = field(metadata={'validators': [validators.max_length_20]})
 
 
 # Complex types

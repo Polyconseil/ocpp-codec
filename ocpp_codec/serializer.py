@@ -36,10 +36,7 @@ def _required_fields(dataclass_class) -> typing.List[dataclasses.Field]:
 
 def _clean_data(field: dataclasses.Field, data: typing.Any, *, parsing: bool) -> typing.Any:
     # Fetch the validators to run
-    validator_list = field.metadata.get('validators', [validators.noop])
-    # Defining a single validator is supported, turn it to a list for easier processing
-    if not isinstance(validator_list, list):
-        validator_list = [validator_list]
+    validator_list = field.metadata.get('validators', [])
 
     for validator in validator_list:
         try:
