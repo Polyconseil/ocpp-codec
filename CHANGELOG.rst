@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.1.5 (unreleased)
+0.2.0 (2020-06-01)
 ------------------
 
 - New: Add a dedicated 'encoder' metadata attribute on fields instead of mixing it with validators.
